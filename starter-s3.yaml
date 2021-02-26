@@ -280,6 +280,7 @@ spec:
       - name: hmac
         secret:
           secretName: hmac-token
+          namespace: prow
       - name: github-token
         secret:
           secretName: github-token
@@ -408,6 +409,7 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
+          namespace: prow
       - name: plugins
         configMap:
           name: plugins
@@ -513,6 +515,7 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
+          namespace: prow
       - name: config
         configMap:
           name: config
@@ -612,6 +615,7 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
+          namespace: prow
       - name: config
         configMap:
           name: config
@@ -1042,6 +1046,7 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
+          namespace: prow
       - name: config
         configMap:
           name: config
@@ -1192,6 +1197,7 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
+          namespace: prow
       - name: s3-credentials
         secret:
           secretName: s3-credentials
