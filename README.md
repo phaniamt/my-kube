@@ -1,6 +1,10 @@
 # my-kubee
 
-kubectl delete namespace prow
+sudo gem install ultrahook
+
+ultrahook.ruby2.7 github http://192.168.43.65:8888/hook
+
+kubectl delete namespace prow test-pods
 
 kubectl create clusterrolebinding cluster-admin-binding-"${USER}" \
   --clusterrole=cluster-admin --user="${USER}"
@@ -13,8 +17,5 @@ kubectl create secret -n prow generic hmac-token --from-file=hmac=/home/nmam/my-
 
 kubectl apply -f s3-secret.yaml
 
-kubectl create configmap -n prow config --from-file config.yaml
+kubectl apply -f starter-s3.yaml --validate=false
 
-kubectl create configmap -n prow plugins --from-file plugins.yaml
-
-kubectl apply -f starter-s3.yaml

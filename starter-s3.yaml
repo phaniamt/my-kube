@@ -94,7 +94,7 @@ data:
       default_decoration_configs:
         "*":
           gcs_configuration:
-            bucket: s3://prow-logs
+            bucket: s3://nmam-bucket
             path_strategy: explicit
           s3_credentials_secret: s3-credentials
           utility_images:
