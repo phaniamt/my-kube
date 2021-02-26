@@ -30,6 +30,7 @@ data:
       - verify-owners
       - wip
       - yuks
+
 ---
 apiVersion: v1
 kind: Secret
@@ -37,7 +38,8 @@ metadata:
   namespace: prow
   name: github-token
 stringData:
-  token: 91522e29ce3706603737fdf6bad4c0d02654c150
+  token: adb76637dee81ea864d23b57e62c48931e316172
+
 ---
 apiVersion: v1
 kind: Secret
@@ -45,8 +47,8 @@ metadata:
   namespace: prow
   name: hmac-token
 stringData:
-  # Generate via `openssl rand -hex 20`. This is the secret used in the GitHub webhook configuration
   hmac: 52680a5de3bdc9c3c80232f672d901f6d6bac977
+
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -114,7 +116,7 @@ data:
         - do-not-merge/work-in-progress
         - do-not-merge/invalid-owners-file
         orgs:
-        - n-mam
+        - n-mam/my-kube
 
     decorate_all_jobs: true
     periodics:
@@ -138,6 +140,80 @@ spec:
     singular: prowjob
     plural: prowjobs
   scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          properties:
+            max_concurrency:
+              type: integer
+              minimum: 0
+            type:
+              type: string
+              enum:
+              - "presubmit"
+              - "postsubmit"
+              - "periodic"
+              - "batch"
+        status:
+          properties:
+            state:
+              type: string
+              enum:
+              - "triggered"
+              - "pending"
+              - "success"
+              - "failure"
+              - "aborted"
+              - "error"
+          anyOf:
+          - not:
+              properties:
+                state:
+                  type: string
+                  enum:
+                  - "success"
+                  - "failure"
+                  - "error"
+          - required:
+            - completionTime
+  additionalPrinterColumns:
+  - name: Job
+    type: string
+    description: The name of the job being run.
+    JSONPath: .spec.job
+  - name: BuildId
+    type: string
+    description: The ID of the job being run.
+    JSONPath: .status.build_id
+  - name: Type
+    type: string
+    description: The type of job being run.
+    JSONPath: .spec.type
+  - name: Org
+    type: string
+    description: The org for which the job is running.
+    JSONPath: .spec.refs.org
+  - name: Repo
+    type: string
+    description: The repo for which the job is running.
+    JSONPath: .spec.refs.repo
+  - name: Pulls
+    type: string
+    description: The pulls for which the job is running.
+    JSONPath: ".spec.refs.pulls[*].number"
+  - name: StartTime
+    type: date
+    description: When the job started running.
+    JSONPath: .status.startTime
+  - name: CompletionTime
+    type: date
+    description: When the job finished running.
+    JSONPath: .status.completionTime
+  - name: State
+    description: The state of the job.
+    type: string
+    JSONPath: .status.state
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -206,7 +282,6 @@ spec:
       - name: hmac
         secret:
           secretName: hmac-token
-          namespace: prow
       - name: github-token
         secret:
           secretName: github-token
@@ -335,7 +410,6 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
-          namespace: prow
       - name: plugins
         configMap:
           name: plugins
@@ -441,7 +515,6 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
-          namespace: prow
       - name: config
         configMap:
           name: config
@@ -461,7 +534,7 @@ spec:
   - port: 80
     targetPort: 8888
 ---
-apiVersion: extensions/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   namespace: prow
@@ -541,7 +614,6 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
-          namespace: prow
       - name: config
         configMap:
           name: config
@@ -564,7 +636,7 @@ metadata:
   name: "deck"
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "deck"
@@ -577,7 +649,7 @@ subjects:
   name: "deck"
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: test-pods
   name: "deck"
@@ -591,7 +663,7 @@ subjects:
   namespace: prow
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "deck"
@@ -610,7 +682,7 @@ rules:
       # - create
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: test-pods
   name: "deck"
@@ -629,7 +701,7 @@ metadata:
   name: "horologium"
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "horologium"
@@ -643,7 +715,7 @@ rules:
       - list
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "horologium"
@@ -662,7 +734,7 @@ metadata:
   name: "sinker"
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "sinker"
@@ -709,7 +781,7 @@ rules:
     - create
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: test-pods
   name: "sinker"
@@ -726,7 +798,7 @@ rules:
       - patch
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "sinker"
@@ -739,7 +811,7 @@ subjects:
   name: "sinker"
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: test-pods
   name: "sinker"
@@ -759,7 +831,7 @@ metadata:
   name: "hook"
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "hook"
@@ -783,7 +855,7 @@ rules:
       - update
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "hook"
@@ -802,7 +874,7 @@ metadata:
   name: "tide"
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "tide"
@@ -818,7 +890,7 @@ rules:
       - watch
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "tide"
@@ -837,7 +909,7 @@ metadata:
   name: "statusreconciler"
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "statusreconciler"
@@ -850,7 +922,7 @@ rules:
       - create
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: "statusreconciler"
@@ -972,7 +1044,6 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
-          namespace: prow
       - name: config
         configMap:
           name: config
@@ -984,7 +1055,7 @@ metadata:
   name: prow-controller-manager
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: prow-controller-manager
@@ -1032,7 +1103,7 @@ rules:
     - create
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: test-pods
   name: prow-controller-manager
@@ -1049,7 +1120,7 @@ rules:
       - patch
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: prow
   name: prow-controller-manager
@@ -1062,7 +1133,7 @@ subjects:
   name: prow-controller-manager
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: test-pods
   name: prow-controller-manager
@@ -1123,7 +1194,6 @@ spec:
       - name: github-token
         secret:
           secretName: github-token
-          namespace: prow
       - name: s3-credentials
         secret:
           secretName: s3-credentials
@@ -1172,7 +1242,7 @@ rules:
     - "patch"
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: crier
   namespace: prow
@@ -1186,7 +1256,7 @@ subjects:
   namespace: prow
 ---
 kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: crier
   namespace: test-pods
