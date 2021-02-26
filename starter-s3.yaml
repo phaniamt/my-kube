@@ -85,11 +85,11 @@ data:
 
     plank:
       job_url_prefix_config:
-        "*": https://prow.localhost/view/
+        "*": https://prow.<< your-domain.com >>/view/
       report_templates:
         '*': >-
-            [Full PR test history](https://prow.localhost/pr-history?org={{.Spec.Refs.Org}}&repo={{.Spec.Refs.Repo}}&pr={{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}).
-            [Your PR dashboard](https://prow.localhost/pr?query=is:pr+state:open+author:{{with
+            [Full PR test history](https://prow.<< your-domain.com >>/pr-history?org={{.Spec.Refs.Org}}&repo={{.Spec.Refs.Repo}}&pr={{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}).
+            [Your PR dashboard](https://prow.<< your-domain.com >>/pr?query=is:pr+state:open+author:{{with
             index .Spec.Refs.Pulls 0}}{{.Author}}{{end}}).
       default_decoration_configs:
         "*":
@@ -126,7 +126,7 @@ data:
         - image: alpine
           command: ["/bin/date"]
 ---
-apiVersion: apiextensions.k8s.io/v1
+apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   name: prowjobs.prow.k8s.io
@@ -532,7 +532,7 @@ spec:
   - port: 80
     targetPort: 8888
 ---
-apiVersion: extensions/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   namespace: prow
