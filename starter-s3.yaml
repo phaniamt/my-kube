@@ -38,7 +38,7 @@ metadata:
   namespace: prow
   name: github-token
 stringData:
-  token: adb76637dee81ea864d23b57e62c48931e316172
+  token: 7c8eac9a6af4be95891a31832c1e215052868faf
 
 ---
 apiVersion: v1
@@ -116,7 +116,7 @@ data:
         - do-not-merge/work-in-progress
         - do-not-merge/invalid-owners-file
         orgs:
-        - n-mam/my-kube
+        - n-mam
 
     decorate_all_jobs: true
     periodics:
@@ -128,7 +128,7 @@ data:
         - image: alpine
           command: ["/bin/date"]
 ---
-apiVersion: apiextensions.k8s.io/v1
+apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   name: prowjobs.prow.k8s.io
@@ -496,8 +496,8 @@ spec:
         - --github-endpoint=https://api.github.com
         - --github-graphql-endpoint=http://ghproxy/graphql
         - --s3-credentials-file=/etc/s3-credentials/service-account.json
-        - --status-path=s3://tide/tide-status
-        - --history-uri=s3://tide/tide-history.json
+        - --status-path=s3://nmam-bucket/tide/tide-status
+        - --history-uri=s3://nmam-bucket/tide/tide-history.json
         ports:
           - name: http
             containerPort: 8888
@@ -596,7 +596,8 @@ spec:
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --s3-credentials-file=/etc/s3-credentials/service-account.json
-        - --status-path=s3://status-reconciler/status-reconciler-status
+        - --status-path=s3://nmam-bucket/status-reconciler/status-reconciler-status
+
         volumeMounts:
         - name: github-token
           mountPath: /etc/github
@@ -1288,14 +1289,12 @@ metadata:
   name: s3-credentials
 stringData:
   service-account.json: |
-    {
-      "region": "minio",
-      "access_key": "<<CHANGE_ME_MINIO_ACCESS_KEY>>",
-      "endpoint": "minio.prow.svc.cluster.local",
-      "insecure": true,
-      "s3_force_path_style": true,
-      "secret_key": "<<CHANGE_ME_MINIO_SECRET_KEY>>"
-    }
+   {
+     "region": "ap-south-1",
+     "s3_force_path_style": true,
+     "access_key": "---insert here----",
+     "secret_key": "----insert here----"
+   }
 ---
 apiVersion: v1
 kind: Secret
@@ -1304,14 +1303,12 @@ metadata:
   name: s3-credentials
 stringData:
   service-account.json: |
-    {
-      "region": "minio",
-      "access_key": "<<CHANGE_ME_MINIO_ACCESS_KEY>>",
-      "endpoint": "minio.prow.svc.cluster.local",
-      "insecure": true,
-      "s3_force_path_style": true,
-      "secret_key": "<<CHANGE_ME_MINIO_SECRET_KEY>>"
-    }
+   {
+     "region": "ap-south-1",
+     "s3_force_path_style": true,
+     "access_key": "--insert here---",
+     "secret_key": "--insert here---"
+   }
 ---
 apiVersion: apps/v1
 kind: Deployment
