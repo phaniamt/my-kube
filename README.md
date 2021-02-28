@@ -11,3 +11,5 @@ kubectl create clusterrolebinding cluster-admin-binding-"${USER}" \
 
 kubectl apply -f starter-s3.yaml --validate=false
 
+kubectl create configmap -n prow config \
+--from-file=config.yaml=/home/nmam/my-kube/config.yaml --dry-run=server -o yaml | kubectl replace configmap -n prow config -f -
