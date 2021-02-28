@@ -1,0 +1,115 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prow
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-pods
+
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  namespace: prow
+  name: "deck"
+
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  namespace: prow
+  name: "horologium"
+
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  namespace: prow
+  name: "sinker"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: prow
+  name: "hook"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: prow
+  name: "tide"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: prow
+  name: "statusreconciler"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: prow
+  name: prow-controller-manager
+
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: crier
+  namespace: prow
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: prow
+  name: github-token
+stringData:
+  token: 7c8eac9a6af4be95891a31832c1e215052868faf
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: prow
+  name: hmac-token
+stringData:
+  hmac: 52680a5de3bdc9c3c80232f672d901f6d6bac977
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: prow
+  name: s3-credentials
+stringData:
+  service-account.json: |
+   {
+     "region": "ap-south-1",
+     "s3_force_path_style": true,
+     "access_key": "---insert here----",
+     "secret_key": "----insert here----"
+   }
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: test-pods
+  name: s3-credentials
+stringData:
+  service-account.json: |
+   {
+     "region": "ap-south-1",
+     "s3_force_path_style": true,
+     "access_key": "--insert here---",
+     "secret_key": "--insert here---"
+   }
