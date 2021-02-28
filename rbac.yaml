@@ -14,50 +14,50 @@ metadata:
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: prow
   name: "deck"
+  namespace: prow
 
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: prow
   name: "horologium"
+  namespace: prow
 
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  namespace: prow
   name: "sinker"
+  namespace: prow
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: prow
   name: "hook"
+  namespace: prow
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: prow
   name: "tide"
+  namespace: prow
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: prow
   name: "statusreconciler"
+  namespace: prow
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: prow
   name: prow-controller-manager
+  namespace: prow
 
 ---
 kind: ServiceAccount
@@ -70,8 +70,8 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: prow
   name: github-token
+  namespace: prow
 stringData:
   token: 7c8eac9a6af4be95891a31832c1e215052868faf
 
@@ -79,8 +79,8 @@ stringData:
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: prow
   name: hmac-token
+  namespace: prow
 stringData:
   hmac: 52680a5de3bdc9c3c80232f672d901f6d6bac977
 
@@ -88,8 +88,8 @@ stringData:
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: prow
   name: s3-credentials
+  namespace: prow
 stringData:
   service-account.json: |
    {
@@ -103,8 +103,8 @@ stringData:
 apiVersion: v1
 kind: Secret
 metadata:
-  namespace: test-pods
   name: s3-credentials
+  namespace: test-pods
 stringData:
   service-account.json: |
    {

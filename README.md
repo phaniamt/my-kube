@@ -9,5 +9,6 @@ kubectl delete namespace prow test-pods
 kubectl create clusterrolebinding cluster-admin-binding-"${USER}" \
   --clusterrole=cluster-admin --user="${USER}"
 
+kubectl apply -f rbac.yaml
 kubectl apply -f starter-s3.yaml --validate=false
 
