@@ -1,8 +1,8 @@
-# my-kubee
+# my-kube
 
 sudo gem install ultrahook
 
-ultrahook.ruby2.7 github http://192.168.43.65:8888/hook
+ultrahook.ruby2.7 github http://192.168.49.1:8888/hook
 
 kubectl delete namespace prow test-pods
 
