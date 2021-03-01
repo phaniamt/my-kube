@@ -17,6 +17,5 @@ kubectl create configmap -n prow config \
 
 
 
-
 -----
 minikube addons enable ingress
