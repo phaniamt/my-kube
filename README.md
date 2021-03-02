@@ -2,7 +2,7 @@
 
 sudo gem install ultrahook
 
-ultrahook.ruby2.7 github http://192.168.49.1:8888/hook
+ultrahook.ruby2.7 github http://192.168.49.1/hook
 
 kubectl delete namespace prow test-pods
 
@@ -19,3 +19,7 @@ kubectl create configmap -n prow config \
 
 -----
 minikube addons enable ingress
+
+tide invalid repo PR loop 
+
+https://github.com/kubernetes/test-infra/issues/16643
