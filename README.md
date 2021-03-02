@@ -2,8 +2,9 @@
 
 sudo gem install ultrahook
 
-kubectl get ingress -n prow
-ultrahook.ruby2.7 github http://<ip addr from above>/hook
+minikube ip
+kubectl get svc -n prow (get the nodeport)
+ultrahook.ruby2.7 github http://192.168.49.2:30849/hook
 
 kubectl delete namespace prow test-pods
 
