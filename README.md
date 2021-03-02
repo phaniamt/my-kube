@@ -7,6 +7,9 @@ ultrahook.ruby2.7 github http://<ip addr from above>/hook
 
 kubectl delete namespace prow test-pods
 
+
+minikube addons enable ingress
+
 kubectl create clusterrolebinding cluster-admin-binding-"${USER}" \
   --clusterrole=cluster-admin --user="${USER}"
 
