@@ -2,7 +2,8 @@
 
 sudo gem install ultrahook
 
-ultrahook.ruby2.7 github http://192.168.49.1/hook
+kubectl get ingress -n prow
+ultrahook.ruby2.7 github http://<ip addr from above>/hook
 
 kubectl delete namespace prow test-pods
 
