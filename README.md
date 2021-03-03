@@ -11,8 +11,7 @@ kubectl delete namespace prow test-pods
 
 minikube addons enable ingress
 
-kubectl create clusterrolebinding cluster-admin-binding-"${USER}" \
-  --clusterrole=cluster-admin --user="${USER}"
+kubectl create clusterrolebinding cluster-admin-binding-"${USER}" --clusterrole=cluster-admin --user="${USER}"
 
 kubectl apply -f starter-s3.yaml --validate=false
 
