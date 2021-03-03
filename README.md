@@ -19,9 +19,12 @@ kubectl create configmap -n prow config \
 --from-file=config.yaml=/home/nmam/my-kube/config.yaml --dry-run=server -o yaml | kubectl replace configmap -n prow config -f -
 
 
+kubectl proxy
+
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
 
 -----
-minikube addons enable ingress
+minikube addons enable dashboard
 
 tide invalid repo PR loop 
 
