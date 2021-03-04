@@ -1,10 +1,28 @@
 # my-kube
 
+minikube cache add gcr.io/k8s-prow/hook:latest
+
+minikube cache add gcr.io/k8s-prow/sinker:latest
+
+minikube cache add gcr.io/k8s-prow/deck:latest
+
+minikube cache add gcr.io/k8s-prow/horologium:latest
+
+minikube cache add gcr.io/k8s-prow/tide:latest
+
+minikube cache add gcr.io/k8s-prow/status-reconciler:latest
+
+minikube cache add gcr.io/k8s-prow/ghproxy:latest
+
+minikube cache add gcr.io/k8s-prow/prow-controller-manager:latest
+
+minikube cache add gcr.io/k8s-prow/crier:latest
+
 sudo gem install ultrahook
 
 minikube ip
 kubectl get svc -n prow (get the nodeport)
-ultrahook.ruby2.7 github http://192.168.49.2:30849/hook
+ultrahook github http://192.168.21.101:31931/hook
 
 kubectl delete namespace prow test-pods
 

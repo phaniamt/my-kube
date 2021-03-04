@@ -20,7 +20,7 @@ metadata:
   namespace: prow
   name: github-token
 stringData:
-  token: b43cd9e313342444fb308d2399f59fab68894e20
+  token: 6d53fbdbd1b6ec5b0ca6efaa97634c1050333418
 
 ---
 apiVersion: v1
@@ -33,18 +33,33 @@ stringData:
 
 ---
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio
+  namespace: prow
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
 kind: Secret
 metadata:
   namespace: prow
   name: s3-credentials
 stringData:
   service-account.json: |
-   {
-     "region": "ap-south-1",
-     "s3_force_path_style": true,
-     "access_key": "---insert here----",
-     "secret_key": "----insert here----"
-   }
+    {
+      "region": "minio",
+      "endpoint": "minio.prow.svc.cluster.local",
+      "insecure": true,
+      "s3_force_path_style": true,
+      "access_key": "minioadmin",
+      "secret_key": "minioadmin"
+    }
 
 ---
 apiVersion: v1
@@ -54,12 +69,90 @@ metadata:
   name: s3-credentials
 stringData:
   service-account.json: |
-   {
-     "region": "ap-south-1",
-     "s3_force_path_style": true,
-     "access_key": "--insert here---",
-     "secret_key": "--insert here---"
-   }
+    {
+      "region": "minio",
+      "endpoint": "minio.prow.svc.cluster.local",
+      "insecure": true,
+      "s3_force_path_style": true,
+      "access_key": "minioadmin",
+      "secret_key": "minioadmin"
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: prow
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: minio
+      initContainers:
+      - name: bucket-creator
+        image: alpine
+        command:
+        - mkdir
+        - -p
+        - /data/nmam-bucket
+        - /data/tide
+        - /data/status-reconciler
+        volumeMounts:
+        - name: data
+          mountPath: "/data"
+      containers:
+      - name: minio
+        volumeMounts:
+        - name: data
+          mountPath: "/data"
+        image: minio/minio:latest
+        args:
+        - server
+        - /data
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: "minioadmin"
+        - name: MINIO_SECRET_KEY
+          value: "minioadmin"
+        - name: MINIO_REGION_NAME
+          value: minio
+        ports:
+        - containerPort: 9000
+        readinessProbe:
+          httpGet:
+            path: /minio/health/ready
+            port: 9000
+          periodSeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: 9000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: prow
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 9000
+    protocol: TCP
+  selector:
+    app: minio
 
 ---
 apiVersion: v1
@@ -137,10 +230,10 @@ data:
             path_strategy: explicit
           s3_credentials_secret: s3-credentials
           utility_images:
-            clonerefs: gcr.io/k8s-prow/clonerefs:v20210224-8a51e1a927
-            entrypoint: gcr.io/k8s-prow/entrypoint:v20210224-8a51e1a927
-            initupload: gcr.io/k8s-prow/initupload:v20210224-8a51e1a927
-            sidecar: gcr.io/k8s-prow/sidecar:v20210224-8a51e1a927
+            clonerefs: gcr.io/k8s-prow/clonerefs:latest
+            entrypoint: gcr.io/k8s-prow/entrypoint:latest
+            initupload: gcr.io/k8s-prow/initupload:latest
+            sidecar: gcr.io/k8s-prow/sidecar:latest
 
     tide:
       queries:
@@ -278,7 +371,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
       - name: hook
-        image: gcr.io/k8s-prow/hook:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/hook:latest
         imagePullPolicy: Always
         args:
         - --dry-run=false
@@ -361,7 +454,7 @@ spec:
       serviceAccountName: "sinker"
       containers:
       - name: sinker
-        image: gcr.io/k8s-prow/sinker:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/sinker:latest
         args:
         - --config-path=/etc/config/config.yaml
         volumeMounts:
@@ -399,7 +492,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
       - name: deck
-        image: gcr.io/k8s-prow/deck:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/deck:latest
         args:
         - --config-path=/etc/config/config.yaml
         - --plugin-config=/etc/plugins/plugins.yaml
@@ -491,7 +584,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
       - name: horologium
-        image: gcr.io/k8s-prow/horologium:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/horologium:latest
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
@@ -526,7 +619,7 @@ spec:
       serviceAccountName: "tide"
       containers:
       - name: tide
-        image: gcr.io/k8s-prow/tide:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/tide:latest
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
@@ -535,8 +628,8 @@ spec:
         - --github-endpoint=https://api.github.com
         - --github-graphql-endpoint=http://ghproxy/graphql
         - --s3-credentials-file=/etc/s3-credentials/service-account.json
-        - --status-path=s3://nmam-bucket/tide/tide-status
-        - --history-uri=s3://nmam-bucket/tide/tide-history.json
+        - --status-path=s3://tide/tide-status
+        - --history-uri=s3://tide/tide-history.json
         ports:
           - name: http
             containerPort: 8888
@@ -595,7 +688,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
       - name: statusreconciler
-        image: gcr.io/k8s-prow/status-reconciler:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/status-reconciler:latest
         args:
         - --dry-run=false
         - --continue-on-error=true
@@ -605,7 +698,7 @@ spec:
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --s3-credentials-file=/etc/s3-credentials/service-account.json
-        - --status-path=s3://nmam-bucket/status-reconciler/status-reconciler-status
+        - --status-path=s3://status-reconciler/status-reconciler-status
 
         volumeMounts:
         - name: github-token
@@ -976,7 +1069,7 @@ spec:
     spec:
       containers:
       - name: ghproxy
-        image: gcr.io/k8s-prow/ghproxy:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/ghproxy:latest
         args:
         - --cache-dir=/cache
         - --cache-sizeGB=99
@@ -1038,7 +1131,7 @@ spec:
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --enable-controller=plank
-        image: gcr.io/k8s-prow/prow-controller-manager:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/prow-controller-manager:latest
         volumeMounts:
         - name: github-token
           mountPath: /etc/github
@@ -1173,7 +1266,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
       - name: crier
-        image: gcr.io/k8s-prow/crier:v20210224-8a51e1a927
+        image: gcr.io/k8s-prow/crier:latest
         args:
         - --blob-storage-workers=10
         - --config-path=/etc/config/config.yaml
