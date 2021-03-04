@@ -20,7 +20,7 @@ metadata:
   namespace: prow
   name: github-token
 stringData:
-  token: 6d53fbdbd1b6ec5b0ca6efaa97634c1050333418
+  token: 4606953fcabfa2024fa33b8a29ce1386a4057d60
 
 ---
 apiVersion: v1

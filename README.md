@@ -44,6 +44,12 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kuber
 -----
 minikube addons enable dashboard
 
-tide invalid repo PR loop 
+------
+strategic merge patch
 
-https://github.com/kubernetes/test-infra/issues/16643
+F:\my-kube>type patch.yaml
+stringData:
+  token: 4606953fcabfa2024fa33b8a29ce1386a4057d60
+
+PS C:\Windows\system32> minikube kubectl -- patch secret github-token -n prow --patch $(Get-Content F:\my-kube\patch.yaml -Raw)
+secret/github-token patched
