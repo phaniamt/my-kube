@@ -261,25 +261,25 @@ data:
         - image: alpine
           command: ["/bin/date"]
 
-    postsubmits:
-      n-mam/my-kube:
-      - name: test-postsubmit
-        decorate: true
-        spec:
-          containers:
-          - image: alpine
-            command: ["/bin/printenv"]
+    # postsubmits:
+    #   n-mam/my-kube:
+    #   - name: test-postsubmit
+    #     decorate: true
+    #     spec:
+    #       containers:
+    #       - image: alpine
+    #         command: ["/bin/printenv"]
 
-    presubmits:
-      n-mam/my-kube:
-      - name: test-presubmit
-        decorate: true
-        always_run: true
-        skip_report: true
-        spec:
-          containers:
-          - image: alpine
-            command: ["/bin/printenv"]
+    # presubmits:
+    #   n-mam/my-kube:
+    #   - name: test-presubmit
+    #     decorate: true
+    #     always_run: true
+    #     skip_report: true
+    #     spec:
+    #       containers:
+    #       - image: alpine
+    #         command: ["/bin/printenv"]
 
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
