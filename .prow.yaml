@@ -1,6 +1,6 @@
 postsubmits:
   n-mam/my-kube:
-  - name: test-postsubmit
+  - name: inrepo-postsubmit
     decorate: true
     spec:
       containers:
@@ -8,7 +8,7 @@ postsubmits:
         command: ["/bin/printenv"]
 presubmits:
   n-mam/my-kube:
-  - name: test-presubmit
+  - name: inrepo-presubmit
     decorate: true
     always_run: true
     skip_report: true
