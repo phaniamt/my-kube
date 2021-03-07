@@ -102,6 +102,7 @@ spec:
       initContainers:
       - name: bucket-creator
         image: alpine
+        imagePullPolicy: IfNotPresent
         command:
         - mkdir
         - -p
@@ -117,6 +118,7 @@ spec:
         - name: data
           mountPath: "/data"
         image: minio/minio:latest
+        imagePullPolicy: IfNotPresent
         args:
         - server
         - /data
@@ -394,7 +396,7 @@ spec:
       containers:
       - name: hook
         image: gcr.io/k8s-prow/hook:latest
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
@@ -477,6 +479,7 @@ spec:
       containers:
       - name: sinker
         image: gcr.io/k8s-prow/sinker:latest
+        imagePullPolicy: IfNotPresent
         args:
         - --config-path=/etc/config/config.yaml
         volumeMounts:
@@ -515,6 +518,7 @@ spec:
       containers:
       - name: deck
         image: gcr.io/k8s-prow/deck:latest
+        imagePullPolicy: IfNotPresent
         args:
         - --config-path=/etc/config/config.yaml
         - --plugin-config=/etc/plugins/plugins.yaml
@@ -607,6 +611,7 @@ spec:
       containers:
       - name: horologium
         image: gcr.io/k8s-prow/horologium:latest
+        imagePullPolicy: IfNotPresent
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
@@ -642,6 +647,7 @@ spec:
       containers:
       - name: tide
         image: gcr.io/k8s-prow/tide:latest
+        imagePullPolicy: IfNotPresent
         args:
         - --dry-run=false
         - --config-path=/etc/config/config.yaml
@@ -711,6 +717,7 @@ spec:
       containers:
       - name: statusreconciler
         image: gcr.io/k8s-prow/status-reconciler:latest
+        imagePullPolicy: IfNotPresent
         args:
         - --dry-run=false
         - --continue-on-error=true
@@ -1092,6 +1099,7 @@ spec:
       containers:
       - name: ghproxy
         image: gcr.io/k8s-prow/ghproxy:latest
+        imagePullPolicy: IfNotPresent
         args:
         - --cache-dir=/cache
         - --cache-sizeGB=99
@@ -1154,6 +1162,7 @@ spec:
         - --github-endpoint=https://api.github.com
         - --enable-controller=plank
         image: gcr.io/k8s-prow/prow-controller-manager:latest
+        imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: github-token
           mountPath: /etc/github
@@ -1289,6 +1298,7 @@ spec:
       containers:
       - name: crier
         image: gcr.io/k8s-prow/crier:latest
+        imagePullPolicy: IfNotPresent
         args:
         - --blob-storage-workers=10
         - --config-path=/etc/config/config.yaml
