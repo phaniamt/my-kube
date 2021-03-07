@@ -196,6 +196,9 @@ data:
       enabled:
         "*": true
 
+    allowed_clusters:
+      "*": ["default"]
+
     deck:
      spyglass:
        lenses:
