@@ -10,3 +10,10 @@ postsubmits:
       - -c
       - .yamllint.conf
       - ./
+
+- name: build-postsubmit
+  decorate: true
+  spec:
+    containers:
+    - image: alpine
+      command: ["/bin/printenv"]
