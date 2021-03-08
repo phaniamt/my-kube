@@ -10,4 +10,3 @@ postsubmits:
       - -c
       - .yamllint.conf
       - ./
-
