@@ -11,11 +11,3 @@ postsubmits:
       - .yamllint.conf
       - ./
 
-postsubmits:
-  n-mam/my-kube:
-  - name: test-postsubmit
-    decorate: true
-    spec:
-      containers:
-      - image: alpine
-        command: ["/bin/printenv"]
