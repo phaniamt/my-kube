@@ -17,7 +17,7 @@ minikube cache add gcr.io/k8s-prow/ghproxy:latest
 minikube cache add gcr.io/k8s-prow/prow-controller-manager:latest
 
 minikube cache add gcr.io/k8s-prow/crier:latest
-
+ 
 sudo gem install ultrahook
 
 minikube ip
