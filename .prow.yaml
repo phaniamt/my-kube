@@ -1,5 +1,5 @@
 postsubmits:
-- name: push-test-infra-yamllint
+- name: yamllint-postsubmit
   always_run: true
   decorate: true
   spec:
@@ -10,3 +10,12 @@ postsubmits:
       - -c
       - .yamllint.conf
       - ./
+
+postsubmits:
+  n-mam/my-kube:
+  - name: test-postsubmit
+    decorate: true
+    spec:
+      containers:
+      - image: alpine
+        command: ["/bin/printenv"]
