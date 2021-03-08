@@ -1,27 +1,12 @@
---- 
-postsubmits: 
-  n-mam/my-kube: 
-    - 
-      decorate: true
-      name: inrepo-postsubmit
-      spec: 
-        containers: 
-          - 
-            command: 
-              - /bin/printenv
-            image: alpine
-
----
-presubmits: 
-  n-mam/my-kube: 
-    - 
-      always_run: true
-      decorate: true
-      name: inrepo-presubmit
-      skip_report: true
-      spec: 
-        containers: 
-          - 
-            command: 
-              - /bin/printenv
-            image: alpine
+postsubmits:
+- name: push-test-infra-yamllint
+  always_run: true
+  decorate: true
+  spec:
+    containers:
+    - image: quay.io/kubermatic/yamllint:0.1
+      command:
+      - yamllint
+      - -c
+      - .yamllint.conf
+      - ./
