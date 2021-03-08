@@ -1,18 +1,25 @@
-postsubmits:
-  n-mam/my-kube:
-  - name: inrepo-postsubmit
-    decorate: true
-    spec:
-      containers:
-      - image: alpine
-        command: ["/bin/printenv"]
-presubmits:
-  n-mam/my-kube:
-  - name: inrepo-presubmit
-    decorate: true
-    always_run: true
-    skip_report: true
-    spec:
-      containers:
-      - image: alpine
-        command: ["/bin/printenv"]
+--- 
+postsubmits: 
+  n-mam/my-kube: 
+    - 
+      decorate: true
+      name: inrepo-postsubmit
+      spec: 
+        containers: 
+          - 
+            command: 
+              - /bin/printenv
+            image: alpine
+presubmits: 
+  n-mam/my-kube: 
+    - 
+      always_run: true
+      decorate: true
+      name: inrepo-presubmit
+      skip_report: true
+      spec: 
+        containers: 
+          - 
+            command: 
+              - /bin/printenv
+            image: alpine
