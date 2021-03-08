@@ -19,7 +19,7 @@ minikube cache add gcr.io/k8s-prow/prow-controller-manager:latest
 minikube cache add gcr.io/k8s-prow/crier:latest
  
 sudo gem install ultrahook
-
+ 
 minikube ip
 kubectl get svc -n prow (get the nodeport)
 ultrahook github http://192.168.21.101:31931/hook
