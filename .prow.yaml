@@ -10,6 +10,8 @@ postsubmits:
             command: 
               - /bin/printenv
             image: alpine
+
+---
 presubmits: 
   n-mam/my-kube: 
     - 
