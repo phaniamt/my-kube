@@ -39,7 +39,11 @@ kubectl create configmap -n prow config \
  
 kubectl proxy
 
-http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
+http://prow.nmam.com:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
+
+
+http://prow.nmam.com/
+http://prow.nmam.com/hook
 
 -----
 minikube addons enable dashboard
