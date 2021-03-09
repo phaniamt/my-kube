@@ -17,10 +17,16 @@ minikube cache add gcr.io/k8s-prow/ghproxy:latest
 minikube cache add gcr.io/k8s-prow/prow-controller-manager:latest
 
 minikube cache add gcr.io/k8s-prow/crier:latest
- 
+
+minikube addons enable dashboard
+minikube addons enable ingress
+
 sudo gem install ultrahook
- 
+
 minikube ip
+
+add minikube ip to etc hosts like "172.17.185.40 prow.nmam.com"
+
 kubectl get svc -n prow (get the nodeport)
 
 ultrahook github http://192.168.21.101:31931/hook
@@ -29,30 +35,22 @@ ultrahook github http://prow.nmam.com/hook
 
 kubectl delete namespace prow test-pods
 
-
-minikube addons enable ingress
-
 kubectl create clusterrolebinding cluster-admin-binding-"${USER}" --clusterrole=cluster-admin --user="${USER}"
 
-kubectl apply -f starter-s3.yaml --validate=false
+kubectl apply -f starter-s3.yaml
 
-kubectl create configmap -n prow config \
---from-file=config.yaml=/home/nmam/my-kube/config.yaml --dry-run=server -o yaml | kubectl replace configmap -n prow config -f -
+### To access the dashboard
 
- 
 kubectl proxy
 
 http://prow.nmam.com:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
 
+### To access prow deck (and hook)
 
 http://prow.nmam.com/  -- should show the prow PR dashboard
 http://prow.nmam.com/hook   ---- should give method not found
 
------
-minikube addons enable dashboard
-
-------
-strategic merge patch
+### strategic merge patch
 
 F:\my-kube>type patch.yaml
 stringData:
