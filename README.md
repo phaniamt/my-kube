@@ -22,7 +22,10 @@ sudo gem install ultrahook
  
 minikube ip
 kubectl get svc -n prow (get the nodeport)
+
 ultrahook github http://192.168.21.101:31931/hook
+
+ultrahook github http://prow.nmam.com/hook
 
 kubectl delete namespace prow test-pods
 
@@ -42,8 +45,8 @@ kubectl proxy
 http://prow.nmam.com:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
 
 
-http://prow.nmam.com/
-http://prow.nmam.com/hook
+http://prow.nmam.com/  -- should show the prow PR dashboard
+http://prow.nmam.com/hook   ---- should give method not found
 
 -----
 minikube addons enable dashboard
