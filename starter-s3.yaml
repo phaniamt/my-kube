@@ -3,13 +3,11 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: prow
-
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: test-pods
-
 ---
 apiVersion: v1
 kind: Secret
@@ -17,8 +15,7 @@ metadata:
   namespace: prow
   name: github-token
 stringData:
-  token: <--insert-here-->
-
+  token: xxxx
 ---
 apiVersion: v1
 kind: Secret
@@ -26,8 +23,7 @@ metadata:
   namespace: prow
   name: hmac-token
 stringData:
-  hmac: <--insert-here-->
-
+  hmac: xxxx
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -40,7 +36,6 @@ spec:
   resources:
     requests:
       storage: 10Gi
-
 ---
 apiVersion: v1
 kind: Secret
@@ -57,7 +52,6 @@ stringData:
       "access_key": "minioadmin",
       "secret_key": "minioadmin"
     }
-
 ---
 apiVersion: v1
 kind: Secret
@@ -74,7 +68,6 @@ stringData:
       "access_key": "minioadmin",
       "secret_key": "minioadmin"
     }
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -106,9 +99,9 @@ spec:
             - /data/nmam-bucket
             - /data/tide
             - /data/status-reconciler
-      volumeMounts:
-        - name: data
-          mountPath: "/data"
+          volumeMounts:
+            - name: data
+              mountPath: "/data"
       containers:
         - name: minio
           volumeMounts:
@@ -137,7 +130,6 @@ spec:
             httpGet:
               path: /minio/health/live
               port: 9000
-
 ---
 apiVersion: v1
 kind: Service
@@ -152,7 +144,6 @@ spec:
       protocol: TCP
   selector:
     app: minio
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -177,7 +168,6 @@ data:
       - verify-owners
       - wip
       - yuks
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -280,7 +270,6 @@ data:
     #       containers:
     #       - image: alpine
     #         command: ["/bin/printenv"]
-
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -329,8 +318,8 @@ spec:
                     - "success"
                     - "failure"
                     - "error"
-          - required:
-            - completionTime
+            - required:
+              - completionTime
   additionalPrinterColumns:
     - name: Job
       type: string
@@ -368,7 +357,6 @@ spec:
       description: The state of the job.
       type: string
       JSONPath: .status.state
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -409,7 +397,7 @@ spec:
               containerPort: 8888
           volumeMounts:
             - name: hmac
-               mountPath: /etc/webhook
+              mountPath: /etc/webhook
               readOnly: true
             - name: github-token
               mountPath: /etc/github
@@ -434,18 +422,18 @@ spec:
             periodSeconds: 3
             timeoutSeconds: 600
       volumes:
-      - name: hmac
-        secret:
-          secretName: hmac-token
-      - name: github-token
-        secret:
-          secretName: github-token
-      - name: config
-        configMap:
-          name: config
-      - name: plugins
-        configMap:
-          name: plugins
+        - name: hmac
+          secret:
+            secretName: hmac-token
+        - name: github-token
+          secret:
+            secretName: github-token
+        - name: config
+          configMap:
+            name: config
+        - name: plugins
+          configMap:
+            name: plugins
 ---
 apiVersion: v1
 kind: Service
@@ -457,7 +445,7 @@ spec:
   selector:
     app: hook
   ports:
-  - port: 8888
+    - port: 8888
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -478,19 +466,19 @@ spec:
     spec:
       serviceAccountName: "sinker"
       containers:
-      - name: sinker
-        image: gcr.io/k8s-prow/sinker:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - --config-path=/etc/config/config.yaml
-        volumeMounts:
-        - name: config
-          mountPath: /etc/config
-          readOnly: true
+        - name: sinker
+          image: gcr.io/k8s-prow/sinker:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --config-path=/etc/config/config.yaml
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
       volumes:
-      - name: config
-        configMap:
-          name: config
+        - name: config
+          configMap:
+            name: config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -564,14 +552,16 @@ spec:
       volumes:
         - name: config
           configMap:
+            name: config
         - name: github-token
           secret:
-          secretName: github-token
+            secretName: github-token
         - name: plugins
           configMap:
+            name: plugins
         - name: s3-credentials
           secret:
-          secretName: s3-credentials
+            secretName: s3-credentials
 ---
 apiVersion: v1
 kind: Service
@@ -585,7 +575,6 @@ spec:
   ports:
     - port: 80
       targetPort: 8080
-
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -602,16 +591,15 @@ spec:
   rules:
     - host: prow.nmam.com
       http:
-      paths:
-        - path: /
-          backend:
-          serviceName: deck
-          servicePort: 80
-        - path: /hook
-          backend:
-          serviceName: hook
-          servicePort: 8888
-
+        paths:
+          - path: /
+            backend:
+              serviceName: deck
+              servicePort: 80
+          - path: /hook
+            backend:
+              serviceName: hook
+              servicePort: 8888
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -648,7 +636,7 @@ spec:
       volumes:
         - name: config
           configMap:
-
+            name: config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -700,13 +688,13 @@ spec:
       volumes:
         - name: github-token
           secret:
-          secretName: github-token
+            secretName: github-token
         - name: config
           configMap:
+            name: config
         - name: s3-credentials
           secret:
-          secretName: s3-credentials
-
+            secretName: s3-credentials
 ---
 apiVersion: v1
 kind: Service
@@ -719,7 +707,6 @@ spec:
   ports:
     - port: 80
       targetPort: 8888
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -770,22 +757,22 @@ spec:
       volumes:
         - name: github-token
           secret:
-          secretName: github-token
+            secretName: github-token
         - name: config
           configMap:
+            name: config
         - name: plugins
           configMap:
+            name: plugins
         - name: s3-credentials
           secret:
-          secretName: s3-credentials
-
+            secretName: s3-credentials
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   namespace: prow
   name: "deck"
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -799,7 +786,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "deck"
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -814,7 +800,6 @@ subjects:
   - kind: ServiceAccount
     name: "deck"
     namespace: prow
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -834,7 +819,6 @@ rules:
       # **Warning:** Only use this for non-public deck instances, this allows
       # anyone with access to your Deck instance to create new Prowjobs
       # - create
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -848,14 +832,12 @@ rules:
       - pods/log
     verbs:
       - get
-
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   namespace: prow
   name: "horologium"
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -870,7 +852,6 @@ rules:
     verbs:
       - create
       - list
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -884,14 +865,12 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "horologium"
-
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   namespace: prow
   name: "sinker"
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -900,33 +879,33 @@ metadata:
   name: "sinker"
 rules:
   - apiGroups:
-      - "prow.k8s.io"
+    - "prow.k8s.io"
     resources:
-      - prowjobs
+    - prowjobs
     verbs:
       - delete
       - list
       - watch
       - get
   - apiGroups:
-      - coordination.k8s.io
+    - coordination.k8s.io
     resources:
-      - leases
+    - leases
     resourceNames:
-      - prow-sinker-leaderlock
+    - prow-sinker-leaderlock
     verbs:
       - get
       - update
   - apiGroups:
       - coordination.k8s.io
     resources:
-      - leases
+    - leases
     verbs:
       - create
   - apiGroups:
       - ""
     resources:
-      - configmaps
+    - configmaps
     resourceNames:
       - prow-sinker-leaderlock
     verbs:
@@ -935,11 +914,10 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - configmaps
-      - events
+    - configmaps
+    - events
     verbs:
       - create
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -948,16 +926,15 @@ metadata:
   name: "sinker"
 rules:
   - apiGroups:
-      - ""
+    - ""
     resources:
-      - pods
+    - pods
     verbs:
       - delete
       - list
       - watch
       - get
       - patch
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -971,7 +948,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "sinker"
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -986,14 +962,12 @@ subjects:
   - kind: ServiceAccount
     name: "sinker"
     namespace: prow
-
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   namespace: prow
   name: "hook"
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1002,9 +976,9 @@ metadata:
   name: "hook"
 rules:
   - apiGroups:
-      - "prow.k8s.io"
+    - "prow.k8s.io"
     resources:
-      - prowjobs
+    - prowjobs
     verbs:
       - create
       - get
@@ -1018,7 +992,6 @@ rules:
       - create
       - get
       - update
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1032,14 +1005,12 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "hook"
-
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   namespace: prow
   name: "tide"
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1048,15 +1019,14 @@ metadata:
   name: "tide"
 rules:
   - apiGroups:
-      - "prow.k8s.io"
+    - "prow.k8s.io"
     resources:
-      - prowjobs
+    - prowjobs
     verbs:
       - create
       - list
       - get
       - watch
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1070,14 +1040,12 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "tide"
-
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   namespace: prow
   name: "statusreconciler"
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1104,7 +1072,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: "statusreconciler"
-
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -1119,7 +1086,6 @@ spec:
   resources:
     requests:
       storage: 100Gi
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1159,7 +1125,6 @@ spec:
         - name: cache
           persistentVolumeClaim:
             claimName: ghproxy
-
 ---
 apiVersion: v1
 kind: Service
@@ -1179,7 +1144,6 @@ spec:
   selector:
     app: ghproxy
   type: ClusterIP
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1220,10 +1184,10 @@ spec:
       volumes:
         - name: github-token
           secret:
-          secretName: github-token
+            secretName: github-token
         - name: config
           configMap:
-
+            name: config
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -1238,9 +1202,9 @@ metadata:
   name: prow-controller-manager
 rules:
   - apiGroups:
-      - "prow.k8s.io"
+    - "prow.k8s.io"
     resources:
-      - prowjobs
+    - prowjobs
     verbs:
       - get
       - list
@@ -1248,37 +1212,36 @@ rules:
       - update
       - patch
   - apiGroups:
-      - coordination.k8s.io
+    - coordination.k8s.io
     resources:
-      - leases
+    - leases
     resourceNames:
       - prow-controller-manager-leader-lock
     verbs:
       - get
       - update
   - apiGroups:
-      - coordination.k8s.io
+    - coordination.k8s.io
     resources:
-      - leases
+    - leases
     verbs:
       - create
   - apiGroups:
-      - ""
+    - ""
     resources:
-      - configmaps
+    - configmaps
     resourceNames:
       - prow-controller-manager-leader-lock
     verbs:
       - get
       - update
   - apiGroups:
-      - ""
+    - ""
     resources:
-      - configmaps
-      - events
+    - configmaps
+    - events
     verbs:
       - create
-
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1287,16 +1250,15 @@ metadata:
   name: prow-controller-manager
 rules:
   - apiGroups:
-      - ""
+    - ""
     resources:
-      - pods
+    - pods
     verbs:
       - delete
       - list
       - watch
       - create
       - patch
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1310,7 +1272,6 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: prow-controller-manager
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1325,7 +1286,6 @@ subjects:
   - kind: ServiceAccount
     name: prow-controller-manager
     namespace: prow
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1372,12 +1332,13 @@ spec:
       volumes:
         - name: config
           configMap:
+            name: config
         - name: github-token
           secret:
-          secretName: github-token
+            secretName: github-token
         - name: s3-credentials
           secret:
-          secretName: s3-credentials
+            secretName: s3-credentials
 ---
 kind: ServiceAccount
 apiVersion: v1
@@ -1392,15 +1353,14 @@ metadata:
   name: crier
 rules:
   - apiGroups:
-      - "prow.k8s.io"
+    - "prow.k8s.io"
     resources:
-      - "prowjobs"
+    - "prowjobs"
     verbs:
-      - "get"
-      - "watch"
-      - "list"
-      - "patch"
-
+      - get
+      - watch
+      - list
+      - patch
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -1409,17 +1369,14 @@ metadata:
   name: crier
 rules:
   - apiGroups:
-      - ""
-resources:
-  - "pods"
-  - "events"
-verbs:
-  - "get"
-  - "list"
-  - "patch"
-  - apiGroups:
-      - ""
-
+    - ""
+    resources:
+    - "pods"
+    - "events"
+    verbs:
+      - get
+      - list
+      - patch
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1434,7 +1391,6 @@ subjects:
   - kind: ServiceAccount
     name: crier
     namespace: prow
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1

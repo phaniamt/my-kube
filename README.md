@@ -18,7 +18,10 @@ minikube cache add gcr.io/k8s-prow/prow-controller-manager:latest
 
 minikube cache add gcr.io/k8s-prow/crier:latest
 
+minikube addons enable metrics-server
 minikube addons enable dashboard
+minikube addons enable volumesnapshots
+minikube addons enable csi-hostpath-driver
 minikube addons enable ingress
 
 sudo gem install ultrahook
@@ -43,18 +46,25 @@ kubectl apply -f starter-s3.yaml
 
 kubectl proxy
 
-http://prow.nmam.com:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
+http://127.0.0.1:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
 
 ### To access prow deck (and hook)
 
 http://prow.nmam.com/  -- should show the prow PR dashboard
-http://prow.nmam.com/hook   ---- should give method not found
+http://prow.nmam.com/hook   -- should give method not found
 
 ### strategic merge patch
 
-F:\my-kube>type patch.yaml
+F:\my-kube>type hmac-token.yaml
 stringData:
-  token: 4606953fcabfa2024fa33b8a29ce1386a4057d60
+  hmac: abcd
 
-PS C:\Windows\system32> minikube kubectl -- patch secret github-token -n prow --patch $(Get-Content F:\my-kube\patch.yaml -Raw)
-secret/github-token patched
+F:\my-kube>type c:\github-token.yaml
+stringData:
+  token: abcd
+
+minikube kubectl -- patch secret hmac-token -n prow --patch $(Get-Content C:\hmac-token.yaml -Raw)
+minikube kubectl -- patch secret github-token -n prow --patch $(Get-Content C:\github-token.yaml -Raw)
+
+### online yaml linter
+https://jsonformatter.org/yaml-validator
