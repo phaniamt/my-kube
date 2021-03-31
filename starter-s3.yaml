@@ -1,6 +1,3 @@
-# This file contains Kubernetes YAML files for the most important prow
-# components. Don't edit resources in this file. Instead, pull them out into
-# their own files.
 ---
 apiVersion: v1
 kind: Namespace
@@ -20,7 +17,7 @@ metadata:
   namespace: prow
   name: github-token
 stringData:
-  token: 725c1ad4d797e4a8d604c44cd946cd7f9ccc268e
+  token: <--insert-here-->
 
 ---
 apiVersion: v1
@@ -29,7 +26,7 @@ metadata:
   namespace: prow
   name: hmac-token
 stringData:
-  hmac: 52680a5de3bdc9c3c80232f672d901f6d6bac977
+  hmac: <--insert-here-->
 
 ---
 apiVersion: v1
@@ -96,50 +93,50 @@ spec:
         app: minio
     spec:
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: minio
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio
       initContainers:
-      - name: bucket-creator
-        image: alpine
-        imagePullPolicy: IfNotPresent
-        command:
-        - mkdir
-        - -p
-        - /data/nmam-bucket
-        - /data/tide
-        - /data/status-reconciler
-        volumeMounts:
+        - name: bucket-creator
+          image: alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - mkdir
+            - -p
+            - /data/nmam-bucket
+            - /data/tide
+            - /data/status-reconciler
+      volumeMounts:
         - name: data
           mountPath: "/data"
       containers:
-      - name: minio
-        volumeMounts:
-        - name: data
-          mountPath: "/data"
-        image: minio/minio:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - server
-        - /data
-        env:
-        - name: MINIO_ACCESS_KEY
-          value: "minioadmin"
-        - name: MINIO_SECRET_KEY
-          value: "minioadmin"
-        - name: MINIO_REGION_NAME
-          value: minio
-        ports:
-        - containerPort: 9000
-        readinessProbe:
-          httpGet:
-            path: /minio/health/ready
-            port: 9000
-          periodSeconds: 20
-        livenessProbe:
-          httpGet:
-            path: /minio/health/live
-            port: 9000
+        - name: minio
+          volumeMounts:
+            - name: data
+              mountPath: "/data"
+          image: minio/minio:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - server
+            - /data
+          env:
+            - name: MINIO_ACCESS_KEY
+              value: "minioadmin"
+            - name: MINIO_SECRET_KEY
+              value: "minioadmin"
+            - name: MINIO_REGION_NAME
+              value: minio
+          ports:
+            - containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            periodSeconds: 20
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
 
 ---
 apiVersion: v1
@@ -150,9 +147,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 80
-    targetPort: 9000
-    protocol: TCP
+    - port: 80
+      targetPort: 9000
+      protocol: TCP
   selector:
     app: minio
 
@@ -308,69 +305,70 @@ spec:
             type:
               type: string
               enum:
-              - "presubmit"
-              - "postsubmit"
-              - "periodic"
-              - "batch"
+                - "presubmit"
+                - "postsubmit"
+                - "periodic"
+                - "batch"
         status:
           properties:
             state:
               type: string
               enum:
-              - "triggered"
-              - "pending"
-              - "success"
-              - "failure"
-              - "aborted"
-              - "error"
+                - "triggered"
+                - "pending"
+                - "success"
+                - "failure"
+                - "aborted"
+                - "error"
           anyOf:
-          - not:
+            - not:
               properties:
                 state:
                   type: string
                   enum:
-                  - "success"
-                  - "failure"
-                  - "error"
+                    - "success"
+                    - "failure"
+                    - "error"
           - required:
             - completionTime
   additionalPrinterColumns:
-  - name: Job
-    type: string
-    description: The name of the job being run.
-    JSONPath: .spec.job
-  - name: BuildId
-    type: string
-    description: The ID of the job being run.
-    JSONPath: .status.build_id
-  - name: Type
-    type: string
-    description: The type of job being run.
-    JSONPath: .spec.type
-  - name: Org
-    type: string
-    description: The org for which the job is running.
-    JSONPath: .spec.refs.org
-  - name: Repo
-    type: string
-    description: The repo for which the job is running.
-    JSONPath: .spec.refs.repo
-  - name: Pulls
-    type: string
-    description: The pulls for which the job is running.
-    JSONPath: ".spec.refs.pulls[*].number"
-  - name: StartTime
-    type: date
-    description: When the job started running.
-    JSONPath: .status.startTime
-  - name: CompletionTime
-    type: date
-    description: When the job finished running.
-    JSONPath: .status.completionTime
-  - name: State
-    description: The state of the job.
-    type: string
-    JSONPath: .status.state
+    - name: Job
+      type: string
+      description: The name of the job being run.
+      JSONPath: .spec.job
+    - name: BuildId
+      type: string
+      description: The ID of the job being run.
+      JSONPath: .status.build_id
+    - name: Type
+      type: string
+      description: The type of job being run.
+      JSONPath: .spec.type
+    - name: Org
+      type: string
+      description: The org for which the job is running.
+      JSONPath: .spec.refs.org
+    - name: Repo
+      type: string
+      description: The repo for which the job is running.
+      JSONPath: .spec.refs.repo
+    - name: Pulls
+      type: string
+      description: The pulls for which the job is running.
+      JSONPath: ".spec.refs.pulls[*].number"
+    - name: StartTime
+      type: date
+      description: When the job started running.
+      JSONPath: .status.startTime
+    - name: CompletionTime
+      type: date
+      description: When the job finished running.
+      JSONPath: .status.completionTime
+    - name: State
+      description: The state of the job.
+      type: string
+      JSONPath: .status.state
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -397,44 +395,44 @@ spec:
       serviceAccountName: "hook"
       terminationGracePeriodSeconds: 300
       containers:
-      - name: hook
-        image: gcr.io/k8s-prow/hook:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - --dry-run=false
-        - --config-path=/etc/config/config.yaml
-        - --github-token-path=/etc/github/token
-        - --github-endpoint=http://ghproxy
-        - --github-endpoint=https://api.github.com
-        ports:
-          - name: http
-            containerPort: 8888
-        volumeMounts:
-        - name: hmac
-          mountPath: /etc/webhook
-          readOnly: true
-        - name: github-token
-          mountPath: /etc/github
-          readOnly: true
-        - name: config
-          mountPath: /etc/config
-          readOnly: true
-        - name: plugins
-          mountPath: /etc/plugins
-          readOnly: true
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8081
-          initialDelaySeconds: 3
-          periodSeconds: 3
-        readinessProbe:
-          httpGet:
-            path: /healthz/ready
-            port: 8081
-          initialDelaySeconds: 10
-          periodSeconds: 3
-          timeoutSeconds: 600
+        - name: hook
+          image: gcr.io/k8s-prow/hook:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --dry-run=false
+            - --config-path=/etc/config/config.yaml
+            - --github-token-path=/etc/github/token
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+          ports:
+            - name: http
+              containerPort: 8888
+          volumeMounts:
+            - name: hmac
+               mountPath: /etc/webhook
+              readOnly: true
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: plugins
+              mountPath: /etc/plugins
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 3
+            timeoutSeconds: 600
       volumes:
       - name: hmac
         secret:
@@ -519,62 +517,60 @@ spec:
       serviceAccountName: "deck"
       terminationGracePeriodSeconds: 300
       containers:
-      - name: deck
-        image: gcr.io/k8s-prow/deck:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - --config-path=/etc/config/config.yaml
-        - --plugin-config=/etc/plugins/plugins.yaml
-        - --tide-url=http://tide/
-        - --hook-url=http://hook:8888/plugin-help
-        - --github-token-path=/etc/github/token
-        - --github-endpoint=http://ghproxy
-        - --github-endpoint=https://api.github.com
-        - --github-graphql-endpoint=http://ghproxy/graphql
-        - --plugin-config=/etc/plugins/plugins.yaml
-        - --s3-credentials-file=/etc/s3-credentials/service-account.json
-        - --spyglass=true
-        ports:
-          - name: http
-            containerPort: 8080
-        volumeMounts:
-        - name: config
-          mountPath: /etc/config
-          readOnly: true
-        - name: github-token
-          mountPath: /etc/github
-          readOnly: true
-        - name: plugins
-          mountPath: /etc/plugins
-          readOnly: true
-        - name: s3-credentials
-          mountPath: /etc/s3-credentials
-          readOnly: true
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8081
-          initialDelaySeconds: 3
-          periodSeconds: 3
-        readinessProbe:
-          httpGet:
-            path: /healthz/ready
-            port: 8081
-          initialDelaySeconds: 10
-          periodSeconds: 3
-          timeoutSeconds: 600
+        - name: deck
+          image: gcr.io/k8s-prow/deck:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --config-path=/etc/config/config.yaml
+            - --plugin-config=/etc/plugins/plugins.yaml
+            - --tide-url=http://tide/
+            - --hook-url=http://hook:8888/plugin-help
+            - --github-token-path=/etc/github/token
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --github-graphql-endpoint=http://ghproxy/graphql
+            - --plugin-config=/etc/plugins/plugins.yaml
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            - --spyglass=true
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: plugins
+              mountPath: /etc/plugins
+              readOnly: true
+            - name: s3-credentials
+              mountPath: /etc/s3-credentials
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 3
+            timeoutSeconds: 600
       volumes:
-      - name: config
-        configMap:
-          name: config
-      - name: github-token
-        secret:
+        - name: config
+          configMap:
+        - name: github-token
+          secret:
           secretName: github-token
-      - name: plugins
-        configMap:
-          name: plugins
-      - name: s3-credentials
-        secret:
+        - name: plugins
+          configMap:
+        - name: s3-credentials
+          secret:
           secretName: s3-credentials
 ---
 apiVersion: v1
@@ -587,8 +583,8 @@ spec:
   selector:
     app: deck
   ports:
-  - port: 80
-    targetPort: 8080
+    - port: 80
+      targetPort: 8080
 
 ---
 apiVersion: extensions/v1beta1
@@ -604,15 +600,15 @@ spec:
     serviceName: deck
     servicePort: 80
   rules:
-  - host: prow.nmam.com
-    http:
+    - host: prow.nmam.com
+      http:
       paths:
-      - path: /
-        backend:
+        - path: /
+          backend:
           serviceName: deck
           servicePort: 80
-      - path: /hook
-        backend:
+        - path: /hook
+          backend:
           serviceName: hook
           servicePort: 8888
 
@@ -625,7 +621,7 @@ metadata:
   labels:
     app: horologium
 spec:
-  replicas: 1 # Do not scale up.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -639,20 +635,20 @@ spec:
       serviceAccountName: "horologium"
       terminationGracePeriodSeconds: 300
       containers:
-      - name: horologium
-        image: gcr.io/k8s-prow/horologium:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - --dry-run=false
-        - --config-path=/etc/config/config.yaml
-        volumeMounts:
-        - name: config
-          mountPath: /etc/config
-          readOnly: true
+        - name: horologium
+          image: gcr.io/k8s-prow/horologium:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --dry-run=false
+            - --config-path=/etc/config/config.yaml
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
       volumes:
-      - name: config
-        configMap:
-          name: config
+        - name: config
+          configMap:
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -662,7 +658,7 @@ metadata:
   labels:
     app: tide
 spec:
-  replicas: 1 # Do not scale up.
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -675,42 +671,42 @@ spec:
     spec:
       serviceAccountName: "tide"
       containers:
-      - name: tide
-        image: gcr.io/k8s-prow/tide:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - --dry-run=false
-        - --config-path=/etc/config/config.yaml
-        - --github-token-path=/etc/github/token
-        - --github-endpoint=http://ghproxy
-        - --github-endpoint=https://api.github.com
-        - --github-graphql-endpoint=http://ghproxy/graphql
-        - --s3-credentials-file=/etc/s3-credentials/service-account.json
-        - --status-path=s3://tide/tide-status
-        - --history-uri=s3://tide/tide-history.json
-        ports:
-          - name: http
-            containerPort: 8888
-        volumeMounts:
-        - name: github-token
-          mountPath: /etc/github
-          readOnly: true
-        - name: config
-          mountPath: /etc/config
-          readOnly: true
-        - name: s3-credentials
-          mountPath: /etc/s3-credentials
-          readOnly: true
+        - name: tide
+          image: gcr.io/k8s-prow/tide:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --dry-run=false
+            - --config-path=/etc/config/config.yaml
+            - --github-token-path=/etc/github/token
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --github-graphql-endpoint=http://ghproxy/graphql
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            - --status-path=s3://tide/tide-status
+            - --history-uri=s3://tide/tide-history.json
+          ports:
+            - name: http
+              containerPort: 8888
+          volumeMounts:
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: s3-credentials
+              mountPath: /etc/s3-credentials
+              readOnly: true
       volumes:
-      - name: github-token
-        secret:
+        - name: github-token
+          secret:
           secretName: github-token
-      - name: config
-        configMap:
-          name: config
-      - name: s3-credentials
-        secret:
+        - name: config
+          configMap:
+        - name: s3-credentials
+          secret:
           secretName: s3-credentials
+
 ---
 apiVersion: v1
 kind: Service
@@ -721,8 +717,8 @@ spec:
   selector:
     app: tide
   ports:
-  - port: 80
-    targetPort: 8888
+    - port: 80
+      targetPort: 8888
 
 ---
 apiVersion: apps/v1
@@ -745,45 +741,42 @@ spec:
       serviceAccountName: statusreconciler
       terminationGracePeriodSeconds: 300
       containers:
-      - name: statusreconciler
-        image: gcr.io/k8s-prow/status-reconciler:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - --dry-run=false
-        - --continue-on-error=true
-        - --plugin-config=/etc/plugins/plugins.yaml
-        - --config-path=/etc/config/config.yaml
-        - --github-token-path=/etc/github/token
-        - --github-endpoint=http://ghproxy
-        - --github-endpoint=https://api.github.com
-        - --s3-credentials-file=/etc/s3-credentials/service-account.json
-        - --status-path=s3://status-reconciler/status-reconciler-status
-
-        volumeMounts:
-        - name: github-token
-          mountPath: /etc/github
-          readOnly: true
-        - name: config
-          mountPath: /etc/config
-          readOnly: true
-        - name: plugins
-          mountPath: /etc/plugins
-          readOnly: true
-        - name: s3-credentials
-          mountPath: /etc/s3-credentials
-          readOnly: true
+        - name: statusreconciler
+          image: gcr.io/k8s-prow/status-reconciler:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --dry-run=false
+            - --continue-on-error=true
+            - --plugin-config=/etc/plugins/plugins.yaml
+            - --config-path=/etc/config/config.yaml
+            - --github-token-path=/etc/github/token
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            - --status-path=s3://status-reconciler/status-reconciler-status
+          volumeMounts:
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: plugins
+              mountPath: /etc/plugins
+              readOnly: true
+            - name: s3-credentials
+              mountPath: /etc/s3-credentials
+              readOnly: true
       volumes:
-      - name: github-token
-        secret:
+        - name: github-token
+          secret:
           secretName: github-token
-      - name: config
-        configMap:
-          name: config
-      - name: plugins
-        configMap:
-          name: plugins
-      - name: s3-credentials
-        secret:
+        - name: config
+          configMap:
+        - name: plugins
+          configMap:
+        - name: s3-credentials
+          secret:
           secretName: s3-credentials
 
 ---
@@ -792,6 +785,7 @@ apiVersion: v1
 metadata:
   namespace: prow
   name: "deck"
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -803,8 +797,9 @@ roleRef:
   kind: Role
   name: "deck"
 subjects:
-- kind: ServiceAccount
-  name: "deck"
+  - kind: ServiceAccount
+    name: "deck"
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -816,9 +811,10 @@ roleRef:
   kind: Role
   name: "deck"
 subjects:
-- kind: ServiceAccount
-  name: "deck"
-  namespace: prow
+  - kind: ServiceAccount
+    name: "deck"
+    namespace: prow
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -838,6 +834,7 @@ rules:
       # **Warning:** Only use this for non-public deck instances, this allows
       # anyone with access to your Deck instance to create new Prowjobs
       # - create
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -851,12 +848,14 @@ rules:
       - pods/log
     verbs:
       - get
+
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   namespace: prow
   name: "horologium"
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -871,6 +870,7 @@ rules:
     verbs:
       - create
       - list
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -882,14 +882,16 @@ roleRef:
   kind: Role
   name: "horologium"
 subjects:
-- kind: ServiceAccount
-  name: "horologium"
+  - kind: ServiceAccount
+    name: "horologium"
+
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   namespace: prow
   name: "sinker"
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -898,45 +900,46 @@ metadata:
   name: "sinker"
 rules:
   - apiGroups:
-    - "prow.k8s.io"
+      - "prow.k8s.io"
     resources:
-    - prowjobs
+      - prowjobs
     verbs:
-    - delete
-    - list
-    - watch
-    - get
+      - delete
+      - list
+      - watch
+      - get
   - apiGroups:
-    - coordination.k8s.io
+      - coordination.k8s.io
     resources:
-    - leases
+      - leases
     resourceNames:
-    - prow-sinker-leaderlock
+      - prow-sinker-leaderlock
     verbs:
-    - get
-    - update
+      - get
+      - update
   - apiGroups:
-    - coordination.k8s.io
+      - coordination.k8s.io
     resources:
-    - leases
+      - leases
     verbs:
-    - create
+      - create
   - apiGroups:
-    - ""
+      - ""
     resources:
-    - configmaps
+      - configmaps
     resourceNames:
-    - prow-sinker-leaderlock
+      - prow-sinker-leaderlock
     verbs:
-    - get
-    - update
+      - get
+      - update
   - apiGroups:
-    - ""
+      - ""
     resources:
-    - configmaps
-    - events
+      - configmaps
+      - events
     verbs:
-    - create
+      - create
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -954,6 +957,7 @@ rules:
       - watch
       - get
       - patch
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -965,8 +969,9 @@ roleRef:
   kind: Role
   name: "sinker"
 subjects:
-- kind: ServiceAccount
-  name: "sinker"
+  - kind: ServiceAccount
+    name: "sinker"
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -978,15 +983,17 @@ roleRef:
   kind: Role
   name: "sinker"
 subjects:
-- kind: ServiceAccount
-  name: "sinker"
-  namespace: prow
+  - kind: ServiceAccount
+    name: "sinker"
+    namespace: prow
+
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   namespace: prow
   name: "hook"
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1011,6 +1018,7 @@ rules:
       - create
       - get
       - update
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1022,14 +1030,16 @@ roleRef:
   kind: Role
   name: "hook"
 subjects:
-- kind: ServiceAccount
-  name: "hook"
+  - kind: ServiceAccount
+    name: "hook"
+
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   namespace: prow
   name: "tide"
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1046,6 +1056,7 @@ rules:
       - list
       - get
       - watch
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1057,14 +1068,16 @@ roleRef:
   kind: Role
   name: "tide"
 subjects:
-- kind: ServiceAccount
-  name: "tide"
+  - kind: ServiceAccount
+    name: "tide"
+
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   namespace: prow
   name: "statusreconciler"
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1089,8 +1102,9 @@ roleRef:
   kind: Role
   name: "statusreconciler"
 subjects:
-- kind: ServiceAccount
-  name: "statusreconciler"
+  - kind: ServiceAccount
+    name: "statusreconciler"
+
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -1105,6 +1119,7 @@ spec:
   resources:
     requests:
       storage: 100Gi
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1127,23 +1142,24 @@ spec:
         app: ghproxy
     spec:
       containers:
-      - name: ghproxy
-        image: gcr.io/k8s-prow/ghproxy:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - --cache-dir=/cache
-        - --cache-sizeGB=99
-        - --push-gateway=pushgateway
-        - --serve-metrics=true
-        ports:
-        - containerPort: 8888
-        volumeMounts:
-        - name: cache
-          mountPath: /cache
+        - name: ghproxy
+          image: gcr.io/k8s-prow/ghproxy:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --cache-dir=/cache
+            - --cache-sizeGB=99
+            - --push-gateway=pushgateway
+            - --serve-metrics=true
+          ports:
+            - containerPort: 8888
+          volumeMounts:
+            - name: cache
+              mountPath: /cache
       volumes:
-      - name: cache
-        persistentVolumeClaim:
-          claimName: ghproxy
+        - name: cache
+          persistentVolumeClaim:
+            claimName: ghproxy
+
 ---
 apiVersion: v1
 kind: Service
@@ -1154,15 +1170,16 @@ metadata:
   name: ghproxy
 spec:
   ports:
-  - name: main
-    port: 80
-    protocol: TCP
-    targetPort: 8888
-  - name: metrics
-    port: 9090
+    - name: main
+      port: 80
+      protocol: TCP
+      targetPort: 8888
+    - name: metrics
+      port: 9090
   selector:
     app: ghproxy
   type: ClusterIP
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1183,30 +1200,30 @@ spec:
     spec:
       serviceAccountName: prow-controller-manager
       containers:
-      - name: prow-controller-manager
-        args:
-        - --dry-run=false
-        - --config-path=/etc/config/config.yaml
-        - --github-token-path=/etc/github/token
-        - --github-endpoint=http://ghproxy
-        - --github-endpoint=https://api.github.com
-        - --enable-controller=plank
-        image: gcr.io/k8s-prow/prow-controller-manager:latest
-        imagePullPolicy: IfNotPresent
-        volumeMounts:
-        - name: github-token
-          mountPath: /etc/github
-          readOnly: true
-        - name: config
-          mountPath: /etc/config
-          readOnly: true
+        - name: prow-controller-manager
+          args:
+            - --dry-run=false
+            - --config-path=/etc/config/config.yaml
+            - --github-token-path=/etc/github/token
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --enable-controller=plank
+          image: gcr.io/k8s-prow/prow-controller-manager:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
       volumes:
-      - name: github-token
-        secret:
+        - name: github-token
+          secret:
           secretName: github-token
-      - name: config
-        configMap:
-          name: config
+        - name: config
+          configMap:
+
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -1221,46 +1238,47 @@ metadata:
   name: prow-controller-manager
 rules:
   - apiGroups:
-    - "prow.k8s.io"
+      - "prow.k8s.io"
     resources:
-    - prowjobs
+      - prowjobs
     verbs:
-    - get
-    - list
-    - watch
-    - update
-    - patch
+      - get
+      - list
+      - watch
+      - update
+      - patch
   - apiGroups:
-    - coordination.k8s.io
+      - coordination.k8s.io
     resources:
-    - leases
+      - leases
     resourceNames:
-    - prow-controller-manager-leader-lock
+      - prow-controller-manager-leader-lock
     verbs:
-    - get
-    - update
+      - get
+      - update
   - apiGroups:
-    - coordination.k8s.io
+      - coordination.k8s.io
     resources:
-    - leases
+      - leases
     verbs:
-    - create
+      - create
   - apiGroups:
-    - ""
+      - ""
     resources:
-    - configmaps
+      - configmaps
     resourceNames:
-    - prow-controller-manager-leader-lock
+      - prow-controller-manager-leader-lock
     verbs:
-    - get
-    - update
+      - get
+      - update
   - apiGroups:
-    - ""
+      - ""
     resources:
-    - configmaps
-    - events
+      - configmaps
+      - events
     verbs:
-    - create
+      - create
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1278,6 +1296,7 @@ rules:
       - watch
       - create
       - patch
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1289,8 +1308,9 @@ roleRef:
   kind: Role
   name: prow-controller-manager
 subjects:
-- kind: ServiceAccount
-  name: prow-controller-manager
+  - kind: ServiceAccount
+    name: prow-controller-manager
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1302,9 +1322,10 @@ roleRef:
   kind: Role
   name: prow-controller-manager
 subjects:
-- kind: ServiceAccount
-  name: prow-controller-manager
-  namespace: prow
+  - kind: ServiceAccount
+    name: prow-controller-manager
+    namespace: prow
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1326,37 +1347,36 @@ spec:
       serviceAccountName: crier
       terminationGracePeriodSeconds: 300
       containers:
-      - name: crier
-        image: gcr.io/k8s-prow/crier:latest
-        imagePullPolicy: IfNotPresent
-        args:
-        - --blob-storage-workers=10
-        - --config-path=/etc/config/config.yaml
-        - --s3-credentials-file=/etc/s3-credentials/service-account.json
-        - --github-endpoint=http://ghproxy
-        - --github-endpoint=https://api.github.com
-        - --github-token-path=/etc/github/token
-        - --github-workers=10
-        - --kubernetes-blob-storage-workers=10
-        volumeMounts:
-        - name: config
-          mountPath: /etc/config
-          readOnly: true
-        - name: github-token
-          mountPath: /etc/github
-          readOnly: true
-        - name: s3-credentials
-          mountPath: /etc/s3-credentials
-          readOnly: true
+        - name: crier
+          image: gcr.io/k8s-prow/crier:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --blob-storage-workers=10
+            - --config-path=/etc/config/config.yaml
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --github-token-path=/etc/github/token
+            - --github-workers=10
+            - --kubernetes-blob-storage-workers=10
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: s3-credentials
+              mountPath: /etc/s3-credentials
+              readOnly: true
       volumes:
-      - name: config
-        configMap:
-          name: config
-      - name: github-token
-        secret:
+        - name: config
+          configMap:
+        - name: github-token
+          secret:
           secretName: github-token
-      - name: s3-credentials
-        secret:
+        - name: s3-credentials
+          secret:
           secretName: s3-credentials
 ---
 kind: ServiceAccount
@@ -1371,15 +1391,16 @@ metadata:
   namespace: prow
   name: crier
 rules:
-- apiGroups:
-    - "prow.k8s.io"
-  resources:
-    - "prowjobs"
-  verbs:
-    - "get"
-    - "watch"
-    - "list"
-    - "patch"
+  - apiGroups:
+      - "prow.k8s.io"
+    resources:
+      - "prowjobs"
+    verbs:
+      - "get"
+      - "watch"
+      - "list"
+      - "patch"
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -1387,20 +1408,18 @@ metadata:
   namespace: test-pods
   name: crier
 rules:
-- apiGroups:
-    - ""
-  resources:
-    - "pods"
-    - "events"
-  verbs:
-    - "get"
-    - "list"
-- apiGroups:
-    - ""
-  resources:
-    - "pods"
-  verbs:
-    - "patch"
+  - apiGroups:
+      - ""
+resources:
+  - "pods"
+  - "events"
+verbs:
+  - "get"
+  - "list"
+  - "patch"
+  - apiGroups:
+      - ""
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1412,9 +1431,10 @@ roleRef:
   kind: Role
   name: crier
 subjects:
-- kind: ServiceAccount
-  name: crier
-  namespace: prow
+  - kind: ServiceAccount
+    name: crier
+    namespace: prow
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -1426,6 +1446,6 @@ roleRef:
   kind: Role
   name: crier
 subjects:
-- kind: ServiceAccount
-  name: crier
-  namespace: prow
+  - kind: ServiceAccount
+    name: crier
+    namespace: prow
