@@ -1,21 +1,13 @@
 # my-kube
 
 minikube cache add gcr.io/k8s-prow/hook:latest
-
 minikube cache add gcr.io/k8s-prow/sinker:latest
-
 minikube cache add gcr.io/k8s-prow/deck:latest
- 
 minikube cache add gcr.io/k8s-prow/horologium:latest
-
 minikube cache add gcr.io/k8s-prow/tide:latest
-
 minikube cache add gcr.io/k8s-prow/status-reconciler:latest
-
 minikube cache add gcr.io/k8s-prow/ghproxy:latest
-
 minikube cache add gcr.io/k8s-prow/prow-controller-manager:latest
-
 minikube cache add gcr.io/k8s-prow/crier:latest
 
 minikube addons enable metrics-server
