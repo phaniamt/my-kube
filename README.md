@@ -1,13 +1,21 @@
 # my-kube
 
 minikube cache add gcr.io/k8s-prow/hook:latest
+
 minikube cache add gcr.io/k8s-prow/sinker:latest
+
 minikube cache add gcr.io/k8s-prow/deck:latest
+
 minikube cache add gcr.io/k8s-prow/horologium:latest
+
 minikube cache add gcr.io/k8s-prow/tide:latest
+
 minikube cache add gcr.io/k8s-prow/status-reconciler:latest
+
 minikube cache add gcr.io/k8s-prow/ghproxy:latest
+
 minikube cache add gcr.io/k8s-prow/prow-controller-manager:latest
+
 minikube cache add gcr.io/k8s-prow/crier:latest
 
 minikube addons enable metrics-server
@@ -16,6 +24,9 @@ minikube addons enable volumesnapshots
 minikube addons enable csi-hostpath-driver
 minikube addons enable ingress
 
+sign up for ultrakook. you'll recieve a api key in your email
+place the contents of the api key in .ultrahook file in user home dir
+install ruby
 sudo gem install ultrahook
 
 minikube ip
@@ -27,8 +38,6 @@ kubectl get svc -n prow (get the nodeport)
 ultrahook github http://192.168.21.101:31931/hook
 
 ultrahook github http://prow.nmam.com/hook
-
-kubectl delete namespace prow test-pods
 
 kubectl create clusterrolebinding cluster-admin-binding-"${USER}" --clusterrole=cluster-admin --user="${USER}"
 
