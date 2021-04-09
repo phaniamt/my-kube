@@ -47,14 +47,15 @@ stringData:
   token: abcd
 
 minikube kubectl -- patch secret hmac-token -n prow --patch $(Get-Content C:\hmac-token.yaml -Raw)
+
 minikube kubectl -- patch secret github-token -n prow --patch $(Get-Content C:\github-token.yaml -Raw)
 
 at this point verify that all prow pods are up and running
 
 ### ultrahook to forward github events to local minikube instance
 
-sign up for ultrakook. you'll recieve a api key in your email
-place the contents of the api key in .ultrahook file in the current user's home dir
+sign up for ultrakook. You'll recieve a api key in your email
+Place the contents of the api key in ".ultrahook" file in the current user's home dir
 install ruby
 sudo gem install ultrahook
 
@@ -79,6 +80,7 @@ http://127.0.0.1:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kuber
 ### To access prow deck (and hook)
 
 http://prow.nmam.com/  -- should show the prow PR dashboard
+
 http://prow.nmam.com/hook   -- should give method not found
 
 
