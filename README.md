@@ -30,6 +30,14 @@ minikube addons enable csi-hostpath-driver
 
 minikube addons enable ingress
 
+### configure github repo webhook
+
+generate github webhook secret:
+
+openssl rand -hex 20
+
+Create a github bot user account and add a PAT with full access. Note down the generated PAT
+
 ### deploy prow yaml
 
 kubectl create clusterrolebinding cluster-admin-binding-"${USER}" --clusterrole=cluster-admin --user="${USER}"
