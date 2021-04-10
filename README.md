@@ -80,7 +80,7 @@ ultrahook github http://192.168.21.101:31931/hook
 ultrahook github http://prow.nmam.com/hook
 
 ### To access the dashboard
-
+ 
 kubectl proxy
 
 http://127.0.0.1:8001/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
