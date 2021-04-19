@@ -98,11 +98,16 @@ https://jsonformatter.org/yaml-validator
 ## setup 2 node kubernetes cluster on Hyper-V
 
 create a debian VM with 2 GB RAM.
-initially assign the network adapter of the VM to the default/external network so that we can download all binaries and containers locally. boot up the VM.
+initially assign the network adapter of the VM to the default/external network so that we can download all binaries and containers locally. Boot up the VM.
 
 disable swap: 
   sudo swapoff -a 
   comment out all swap entries in the /etc/fstab file. 
+
+Enable IP forwarding:
+  sysctl -w net.ipv4.ip_forward=1
+  sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+  sudo sysctl -p /etc/sysctl.conf
 
 open ports on your Master Node:
 
@@ -121,7 +126,23 @@ sudo ufw allow 10251/tcp
 sudo ufw allow 10255/tcp
 sudo ufw reload
 
+Install jq:
+  sudo apt install jq
+  needed for gettings the taints on nodes later : kubectl get nodes -o json | jq '.items[].spec.taints'
+
 Install DockerCE
+
+Go to https://download.docker.com/linux/debian/dists/, choose your Debian version, then browse to pool/stable/, choose amd64, armhf, or arm64, and download the .deb file for the Docker Engine version you want to install.
+
+  sudo dpkg -i /path/to/package.deb
+
+Verify that Docker Engine is installed correctly by running the hello-world image.
+
+  sudo docker run hello-world
+
+Docker as a non-root user, you should now consider adding your user to the “docker” group with something like:
+
+ sudo usermod -aG docker <your-user>
 
 Download/cache all kubernetes container images required for an offline install
   kubeadm config images pull
@@ -218,3 +239,7 @@ In order to get a kubectl on some other computer (e.g. laptop) to talk to your c
 for cleanup refer:
 
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
+
+etcd and control plane HA
+  https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/setup-ha-etcd-with-kubeadm/
+  https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
